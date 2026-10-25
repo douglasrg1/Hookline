@@ -8,9 +8,39 @@ namespace Hookline.ArchitectureTests;
 
 public class ModuleBoundaryTests
 {
-    private static readonly string[] ModuleNames = ["Management", "Ingestion", "Delivery"];
+    private static readonly string[] ModuleNames = DiscoverModules();
     public static TheoryData<string> Modules => new(ModuleNames);
     private static Assembly Load(string module) => Assembly.Load($"Hookline.Modules.{module}");
+
+    private static string[] DiscoverModules()
+    {
+        var modulesDirectory = Path.Combine(FindRepositoryRoot(), "src", "Modules");
+
+        return Directory.GetDirectories(modulesDirectory)
+            .Select(Path.GetFileName)
+            .OfType<string>()
+            .Order()
+            .ToArray();
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Hookline.slnx")))
+        {
+            directory = directory.Parent;
+        }
+
+        return directory?.FullName
+            ?? throw new InvalidOperationException("Could not find the repository root (Hookline.slnx).");
+    }
+
+    [Fact]
+    public void Modules_are_discovered_from_source_folders()
+    {
+        ModuleNames.ShouldNotBeEmpty();
+    }
 
     [Theory, MemberData(nameof(Modules))]
     public void Module_does_not_reference_other_modules(string module)
