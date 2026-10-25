@@ -17,7 +17,7 @@ services:
   api:
     build: .
     environment:
-      ConnectionStrings__Hookline: Host=postgres;Database=hookline;Username=hookline;Password=${POSTGRES_PASSWORD}
+      ConnectionStrings__Hookline: Host=postgres;Database=hookline;Username=hookline;Password=${POSTGRES_PASSWORD};Gss Encryption Mode=Disable
     ports:
       - "8080:8080"
     depends_on:
