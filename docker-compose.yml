@@ -1,3 +1,5 @@
+name: hookline
+
 services:
   postgres:
     image: postgres:17
