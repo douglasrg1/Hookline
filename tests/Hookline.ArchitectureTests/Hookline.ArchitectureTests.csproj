@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NetArchTest.Rules" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Modules\Management\Hookline.Modules.Management\Hookline.Modules.Management.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Ingestion\Hookline.Modules.Ingestion\Hookline.Modules.Ingestion.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Delivery\Hookline.Modules.Delivery\Hookline.Modules.Delivery.csproj" />
+  </ItemGroup>
+
+</Project>
