@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Hookline.Api/Hookline.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Delivery/">
+    <Project Path="src/Modules/Delivery/Hookline.Modules.Delivery.Contracts/Hookline.Modules.Delivery.Contracts.csproj" />
+    <Project Path="src/Modules/Delivery/Hookline.Modules.Delivery/Hookline.Modules.Delivery.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ingestion/">
+    <Project Path="src/Modules/Ingestion/Hookline.Modules.Ingestion.Contracts/Hookline.Modules.Ingestion.Contracts.csproj" />
+    <Project Path="src/Modules/Ingestion/Hookline.Modules.Ingestion/Hookline.Modules.Ingestion.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Management/">
+    <Project Path="src/Modules/Management/Hookline.Modules.Management.Contracts/Hookline.Modules.Management.Contracts.csproj" />
+    <Project Path="src/Modules/Management/Hookline.Modules.Management/Hookline.Modules.Management.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Hookline.ArchitectureTests/Hookline.ArchitectureTests.csproj" />
+  </Folder>
+</Solution>

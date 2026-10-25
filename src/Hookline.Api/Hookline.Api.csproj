@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\Management\Hookline.Modules.Management\Hookline.Modules.Management.csproj" />
+    <ProjectReference Include="..\Modules\Ingestion\Hookline.Modules.Ingestion\Hookline.Modules.Ingestion.csproj" />
+    <ProjectReference Include="..\Modules\Delivery\Hookline.Modules.Delivery\Hookline.Modules.Delivery.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+  </ItemGroup>
+
+</Project>
