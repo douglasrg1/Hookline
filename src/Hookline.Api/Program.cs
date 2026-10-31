@@ -28,4 +28,8 @@ app.UseStatusCodePages();
 
 app.MapHealthChecks("/health");
 
+app.MapManagementEndpoints()
+    .MapIngestionEndpoints()
+    .MapDeliveryEndpoints();
+
 app.Run();

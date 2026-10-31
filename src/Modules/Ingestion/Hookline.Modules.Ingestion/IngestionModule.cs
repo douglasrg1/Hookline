@@ -1,4 +1,6 @@
 using Hookline.Modules.Ingestion.Infrastructure;
+using Hookline.Modules.Ingestion.Presentation;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,4 +16,7 @@ public static class IngestionModule
 
         return services;
     }
+
+    public static IEndpointRouteBuilder MapIngestionEndpoints(this IEndpointRouteBuilder endpoints)
+        => IngestionEndpoints.Map(endpoints);
 }
