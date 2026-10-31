@@ -21,6 +21,7 @@
     <ProjectReference Include="..\..\src\Modules\Management\Hookline.Modules.Management\Hookline.Modules.Management.csproj" />
     <ProjectReference Include="..\..\src\Modules\Ingestion\Hookline.Modules.Ingestion\Hookline.Modules.Ingestion.csproj" />
     <ProjectReference Include="..\..\src\Modules\Delivery\Hookline.Modules.Delivery\Hookline.Modules.Delivery.csproj" />
+    <ProjectReference Include="..\..\src\Hookline.SharedKernel\Hookline.SharedKernel.csproj" />
   </ItemGroup>
 
 </Project>
