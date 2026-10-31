@@ -87,4 +87,15 @@ public class ModuleBoundaryTests
 
         result.IsSuccessful.ShouldBeTrue(string.Join(", ", result.FailingTypeNames ?? []));
     }
+
+    [Theory, MemberData(nameof(Modules))]
+    public void Only_presentation_depends_on_the_aspnetcore_shared_kernel(string module)
+    {
+        var result = Types.InAssembly(Load(module))
+            .That().DoNotResideInNamespace($"Hookline.Modules.{module}.Presentation")
+            .ShouldNot().HaveDependencyOn("Hookline.SharedKernel.AspNetCore")
+            .GetResult();
+
+        result.IsSuccessful.ShouldBeTrue(string.Join(", ", result.FailingTypeNames ?? []));
+    }
 }
