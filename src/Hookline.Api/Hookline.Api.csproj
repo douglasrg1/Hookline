@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Modules\Management\Hookline.Modules.Management\Hookline.Modules.Management.csproj" />
     <ProjectReference Include="..\Modules\Ingestion\Hookline.Modules.Ingestion\Hookline.Modules.Ingestion.csproj" />
     <ProjectReference Include="..\Modules\Delivery\Hookline.Modules.Delivery\Hookline.Modules.Delivery.csproj" />
+    <ProjectReference Include="..\Hookline.SharedKernel.AspNetCore\Hookline.SharedKernel.AspNetCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

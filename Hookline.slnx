@@ -18,6 +18,7 @@
     <Project Path="src/Modules/Management/Hookline.Modules.Management/Hookline.Modules.Management.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Hookline.Api.Tests/Hookline.Api.Tests.csproj" />
     <Project Path="tests/Hookline.ArchitectureTests/Hookline.ArchitectureTests.csproj" />
     <Project Path="tests/Hookline.SharedKernel.Tests/Hookline.SharedKernel.Tests.csproj" />
   </Folder>
