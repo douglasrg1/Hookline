@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Hookline.Api/Hookline.Api.csproj" />
+    <Project Path="src/Hookline.SharedKernel.AspNetCore/Hookline.SharedKernel.AspNetCore.csproj" />
+    <Project Path="src/Hookline.SharedKernel/Hookline.SharedKernel.csproj" />
   </Folder>
   <Folder Name="/src/Modules/" />
   <Folder Name="/src/Modules/Delivery/">
@@ -16,6 +18,8 @@
     <Project Path="src/Modules/Management/Hookline.Modules.Management/Hookline.Modules.Management.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Hookline.Api.Tests/Hookline.Api.Tests.csproj" />
     <Project Path="tests/Hookline.ArchitectureTests/Hookline.ArchitectureTests.csproj" />
+    <Project Path="tests/Hookline.SharedKernel.Tests/Hookline.SharedKernel.Tests.csproj" />
   </Folder>
 </Solution>

@@ -60,29 +60,70 @@ public class ModuleBoundaryTests
     }
 
     [Theory, MemberData(nameof(Modules))]
-    public void Domain_does_not_depend_on_other_layers_or_persistence(string module)
+    public void Domain_does_not_depend_on_other_layers_web_or_persistence(string module)
+    {
+        AssertLayerDoesNotDependOn(
+            module,
+            "Domain",
+            $"Hookline.Modules.{module}.Application",
+            $"Hookline.Modules.{module}.Infrastructure",
+            $"Hookline.Modules.{module}.Presentation",
+            "Microsoft.AspNetCore",
+            "Microsoft.EntityFrameworkCore",
+            "Npgsql");
+    }
+
+    [Theory, MemberData(nameof(Modules))]
+    public void Application_does_not_depend_on_outer_layers_web_or_persistence(string module)
+    {
+        AssertLayerDoesNotDependOn(
+            module,
+            "Application",
+            $"Hookline.Modules.{module}.Infrastructure",
+            $"Hookline.Modules.{module}.Presentation",
+            "Microsoft.AspNetCore",
+            "Microsoft.EntityFrameworkCore",
+            "Npgsql");
+    }
+
+    [Theory, MemberData(nameof(Modules))]
+    public void Infrastructure_does_not_depend_on_presentation_or_web(string module)
+    {
+        AssertLayerDoesNotDependOn(
+            module,
+            "Infrastructure",
+            $"Hookline.Modules.{module}.Presentation",
+            "Microsoft.AspNetCore");
+    }
+
+    [Theory, MemberData(nameof(Modules))]
+    public void Presentation_depends_only_on_application(string module)
+    {
+        AssertLayerDoesNotDependOn(
+            module,
+            "Presentation",
+            $"Hookline.Modules.{module}.Domain",
+            $"Hookline.Modules.{module}.Infrastructure",
+            "Microsoft.EntityFrameworkCore",
+            "Npgsql");
+    }
+
+    [Theory, MemberData(nameof(Modules))]
+    public void Only_presentation_depends_on_the_aspnetcore_shared_kernel(string module)
     {
         var result = Types.InAssembly(Load(module))
-            .That().ResideInNamespace($"Hookline.Modules.{module}.Domain")
-            .ShouldNot().HaveDependencyOnAny(
-                $"Hookline.Modules.{module}.Application",
-                $"Hookline.Modules.{module}.Infrastructure",
-                "Microsoft.EntityFrameworkCore",
-                "Npgsql")
+            .That().DoNotResideInNamespace($"Hookline.Modules.{module}.Presentation")
+            .ShouldNot().HaveDependencyOn("Hookline.SharedKernel.AspNetCore")
             .GetResult();
 
         result.IsSuccessful.ShouldBeTrue(string.Join(", ", result.FailingTypeNames ?? []));
     }
 
-    [Theory, MemberData(nameof(Modules))]
-    public void Application_does_not_depend_on_infrastructure_or_persistence(string module)
+    private static void AssertLayerDoesNotDependOn(string module, string layer, params string[] forbidden)
     {
         var result = Types.InAssembly(Load(module))
-            .That().ResideInNamespace($"Hookline.Modules.{module}.Application")
-            .ShouldNot().HaveDependencyOnAny(
-                $"Hookline.Modules.{module}.Infrastructure",
-                "Microsoft.EntityFrameworkCore",
-                "Npgsql")
+            .That().ResideInNamespace($"Hookline.Modules.{module}.{layer}")
+            .ShouldNot().HaveDependencyOnAny(forbidden)
             .GetResult();
 
         result.IsSuccessful.ShouldBeTrue(string.Join(", ", result.FailingTypeNames ?? []));

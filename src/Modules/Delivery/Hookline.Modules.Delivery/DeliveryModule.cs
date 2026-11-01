@@ -1,4 +1,6 @@
 using Hookline.Modules.Delivery.Infrastructure;
+using Hookline.Modules.Delivery.Presentation;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,4 +16,7 @@ public static class DeliveryModule
 
         return services;
     }
+
+    public static IEndpointRouteBuilder MapDeliveryEndpoints(this IEndpointRouteBuilder endpoints)
+        => DeliveryEndpoints.Map(endpoints);
 }

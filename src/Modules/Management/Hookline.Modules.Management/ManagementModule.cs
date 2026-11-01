@@ -1,4 +1,6 @@
 using Hookline.Modules.Management.Infrastructure;
+using Hookline.Modules.Management.Presentation;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,4 +16,7 @@ public static class ManagementModule
 
         return services;
     }
+
+    public static IEndpointRouteBuilder MapManagementEndpoints(this IEndpointRouteBuilder endpoints)
+        => ManagementEndpoints.Map(endpoints);
 }
