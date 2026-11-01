@@ -6,7 +6,9 @@ using Hookline.Modules.Management.Application.Consumers;
 using Hookline.Modules.Management.Infrastructure;
 using Hookline.Modules.Management.Tests.Integration;
 
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 
 using Testcontainers.PostgreSql;
@@ -50,13 +52,17 @@ public sealed class PostgreSqlFixture : IAsyncLifetime
         return new ManagementDbContext(options.Options);
     }
 
+    // Every route the API maps, as the routing system sees them.
+    internal IReadOnlyList<RouteEndpoint> Routes =>
+        [.. Api.Services.GetRequiredService<EndpointDataSource>().Endpoints.OfType<RouteEndpoint>()];
+
+    // Started on first use, so the tests that only touch the database do not pay for it.
+    private ManagementApiFactory Api => api ??= new ManagementApiFactory(container.GetConnectionString(), Clock);
+
     // A client of the API, sending the given key as "Authorization: Bearer <key>", or no key at all.
     internal HttpClient CreateClient(string? key = ManagementApiFactory.OrganizationKey)
     {
-        // Started on first use, so the tests that only touch the database do not pay for it.
-        api ??= new ManagementApiFactory(container.GetConnectionString(), Clock);
-
-        var client = api.CreateClient();
+        var client = Api.CreateClient();
 
         if (key is not null)
         {

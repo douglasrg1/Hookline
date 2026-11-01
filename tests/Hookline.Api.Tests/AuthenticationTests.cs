@@ -1,6 +1,10 @@
 using System.Net;
 using System.Text.Json;
 
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+
 using Shouldly;
 
 namespace Hookline.Api.Tests;
@@ -62,6 +66,19 @@ public class AuthenticationTests(HooklineApiFactory factory) : IClassFixture<Hoo
 
         // The test database is unreachable, so the check answers Unhealthy, but it answers.
         response.StatusCode.ShouldBe(HttpStatusCode.ServiceUnavailable);
+    }
+
+    // The fallback policy protects every route that does not opt out. This makes opting out visible:
+    // a route marked as public by mistake fails here.
+    [Fact]
+    public void Only_health_is_public_in_production()
+    {
+        var publicRoutes = factory.Services.GetRequiredService<EndpointDataSource>().Endpoints
+            .OfType<RouteEndpoint>()
+            .Where(endpoint => endpoint.Metadata.GetMetadata<IAllowAnonymous>() is not null)
+            .Select(endpoint => endpoint.RoutePattern.RawText);
+
+        publicRoutes.ShouldBe(["/health"]);
     }
 
     [Fact]
