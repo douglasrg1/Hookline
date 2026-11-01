@@ -8,8 +8,8 @@ namespace Hookline.Api.Tests;
 // The pipeline around authentication. The key checks themselves are covered in the Management tests.
 public class AuthenticationTests(HooklineApiFactory factory) : IClassFixture<HooklineApiFactory>
 {
-    // Any route works: the fallback policy protects routes that do not exist too.
-    private const string ProtectedPath = "/consumers";
+    // A route that does not exist: the fallback policy protects it too, and nothing here touches the database.
+    private const string ProtectedPath = "/not-a-route";
 
     [Fact]
     public async Task Request_without_a_key_gets_a_bearer_challenge()

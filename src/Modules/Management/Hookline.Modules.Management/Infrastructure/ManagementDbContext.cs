@@ -1,3 +1,4 @@
+using Hookline.Modules.Management.Application.Abstractions;
 using Hookline.Modules.Management.Domain.ConsumerKeys;
 using Hookline.Modules.Management.Domain.Consumers;
 using Hookline.Modules.Management.Domain.Endpoints;
@@ -5,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hookline.Modules.Management.Infrastructure;
 
-internal sealed class ManagementDbContext(DbContextOptions<ManagementDbContext> options) : DbContext(options)
+// Also the module's unit of work: SaveChangesAsync already saves every tracked change in one transaction.
+internal sealed class ManagementDbContext(DbContextOptions<ManagementDbContext> options) : DbContext(options), IUnitOfWork
 {
     internal const string Schema = "management";
 

@@ -1,5 +1,6 @@
 using Hookline.Modules.Management.Application.Abstractions;
 using Hookline.Modules.Management.Application.Authentication;
+using Hookline.Modules.Management.Application.Consumers;
 using Hookline.Modules.Management.Infrastructure;
 using Hookline.Modules.Management.Infrastructure.Repositories;
 using Hookline.Modules.Management.Infrastructure.Security;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Hookline.Modules.Management;
 
@@ -32,15 +34,26 @@ public static class ManagementModule
             .ValidateOnStart();
 
         services.AddSingleton<ISecretProtector, AesGcmSecretProtector>();
+        services.TryAddSingleton(TimeProvider.System);
 
+        services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ManagementDbContext>());
+        services.AddScoped<IConsumerRepository, ConsumerRepository>();
         services.AddScoped<IConsumerKeyRepository, ConsumerKeyRepository>();
+
         services.AddScoped<KeyAuthenticator>();
+        services.AddScoped<CreateConsumer>();
+        services.AddScoped<ListConsumers>();
+        services.AddScoped<GetConsumer>();
+        services.AddScoped<DeleteConsumer>();
 
         // Consumers and their keys live in this module, so it provides the API's only authentication scheme.
         services.AddAuthentication(BearerKeyAuthenticationHandler.SchemeName)
             .AddScheme<AuthenticationSchemeOptions, BearerKeyAuthenticationHandler>(
                 BearerKeyAuthenticationHandler.SchemeName,
                 configureOptions: null);
+
+        services.AddAuthorizationBuilder()
+            .AddPolicy(AuthorizationPolicies.Organization, policy => policy.RequireRole(CallerClaims.OrganizationRole));
 
         return services;
     }
