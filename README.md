@@ -38,13 +38,21 @@ Prerequisites: [.NET 10 SDK](https://dotnet.microsoft.com/download) and Docker.
 
 ### Run everything with Docker
 
-1. Create your local environment file and set a password for the local database:
+1. Create your local environment file:
 
    ```bash
    cp .env.example .env
    ```
 
-2. Start the database and the API:
+   Set a password for the local database and fill in the two keys, generating each one with:
+
+   ```bash
+   openssl rand -base64 32
+   ```
+
+   `AUTH_ORGANIZATION_KEY` is the organization's API key. `ENCRYPTION_KEY` is the master key that encrypts the endpoint signing secrets.
+
+2. Start the database and the API. The API applies the database migrations when it starts:
 
    ```bash
    docker compose up --build
@@ -64,12 +72,21 @@ Start only the database:
 docker compose up -d postgres
 ```
 
-Then create `src/Hookline.Api/appsettings.Development.json` with your local values. `appsettings.json` lists every setting the API needs, with empty values; the API refuses to start while a required one is empty. Use the same password you set in `.env`:
+Then create `src/Hookline.Api/appsettings.Development.json` with your local values. `appsettings.json` lists every setting the API needs, with empty values; the API refuses to start while a required one is empty or invalid. Use the same password you set in `.env`, and generate each key with `openssl rand -base64 32`:
 
 ```json
 {
   "ConnectionStrings": {
     "Hookline": "Host=localhost;Port=5433;Database=hookline;Username=hookline;Password=<your-local-password>"
+  },
+  "Database": {
+    "ApplyMigrationsOnStartup": true
+  },
+  "Auth": {
+    "OrganizationKey": "<generated-key>"
+  },
+  "Encryption": {
+    "Key": "<generated-key>"
   }
 }
 ```

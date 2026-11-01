@@ -30,6 +30,11 @@ internal sealed class AesGcmSecretProtector : ISecretProtector
     // Bytes that come before the ciphertext: the version byte plus the nonce.
     private const int HeaderLength = 1 + NonceLength;
 
+    // Same error for every invalid key, pointing to the exact setting to fix.
+    // Also used by the startup check in ManagementModule.
+    internal static readonly string InvalidKeyMessage =
+        $"'{EncryptionOptions.SectionName}:{nameof(EncryptionOptions.Key)}' must be a base64-encoded key of {KeyLength} bytes.";
+
     // The master key, decoded once from configuration. It lives only in memory, never in the database.
     private readonly byte[] _key;
 
@@ -38,10 +43,16 @@ internal sealed class AesGcmSecretProtector : ISecretProtector
         // Fails fast if the options were not provided at all.
         ArgumentNullException.ThrowIfNull(options);
 
-        // Decodes and validates the key here, so a bad configuration stops the API at startup
-        // instead of failing on the first secret that needs to be encrypted.
-        _key = DecodeKey(options.Value.Key);
+        // The API already checks the key at startup. Checking again here keeps the class safe
+        // when it is created directly, as the tests do.
+        if (!TryDecodeKey(options.Value.Key, out _key))
+        {
+            throw new InvalidOperationException(InvalidKeyMessage);
+        }
     }
+
+    // The startup check in ManagementModule uses this, so both apply exactly the same rules.
+    internal static bool IsValidKey(string? encodedKey) => TryDecodeKey(encodedKey, out _);
 
     public byte[] Protect(string plainText)
     {
@@ -124,27 +135,15 @@ internal sealed class AesGcmSecretProtector : ISecretProtector
         return Encoding.UTF8.GetString(plainBytes);
     }
 
-    private static byte[] DecodeKey(string? encodedKey)
+    private static bool TryDecodeKey(string? encodedKey, out byte[] key)
     {
-        // Same error for every invalid case, pointing to the exact setting to fix.
-        var invalidKey = new InvalidOperationException(
-            $"'{EncryptionOptions.SectionName}:Key' must be a base64-encoded key of {KeyLength} bytes.");
-
-        // An empty setting means the key was never configured.
-        if (string.IsNullOrWhiteSpace(encodedKey))
-        {
-            throw invalidKey;
-        }
-
         // A buffer with exactly the expected size: a longer key will not fit and fails the decode below.
-        var key = new byte[KeyLength];
+        key = new byte[KeyLength];
 
-        // Rejects text that is not base64, and keys that decode to fewer than 32 bytes.
-        if (!Convert.TryFromBase64String(encodedKey, key, out var written) || written != KeyLength)
-        {
-            throw invalidKey;
-        }
-
-        return key;
+        // An empty setting means the key was never configured. Text that is not base64,
+        // or that decodes to fewer than 32 bytes, is rejected too.
+        return !string.IsNullOrWhiteSpace(encodedKey)
+            && Convert.TryFromBase64String(encodedKey, key, out var written)
+            && written == KeyLength;
     }
 }
