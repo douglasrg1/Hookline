@@ -427,5 +427,8 @@ FodyWeavers.xsd
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
 
-# Local development settings (may contain secrets). Commit only the .example file.
+# Local development settings (may contain secrets). appsettings.json lists every setting.
 **/appsettings.Development.json
+
+# macOS Finder metadata
+.DS_Store
