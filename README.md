@@ -63,10 +63,22 @@ Start only the database:
 docker compose up -d postgres
 ```
 
-Then give the API its connection string, for example with user secrets:
+Then create `src/Hookline.Api/appsettings.Development.json` with your local values. `appsettings.json` lists every setting the API needs, with empty values; the API refuses to start while a required one is empty. Use the same password you set in `.env`:
+
+```json
+{
+  "ConnectionStrings": {
+    "Hookline": "Host=localhost;Port=5433;Database=hookline;Username=hookline;Password=<your-local-password>"
+  }
+}
+```
+
+`appsettings.Development.json` is ignored by git and by the Docker build, so local secrets never leave your machine.
+
+Run the API. In Development, the interactive API reference opens at `/scalar`:
 
 ```bash
-dotnet user-secrets set "ConnectionStrings:Hookline" "Host=localhost;Port=5432;Database=hookline;Username=hookline;Password=<your-local-password>" --project src/Hookline.Api
+dotnet run --project src/Hookline.Api
 ```
 
 ### Run the tests

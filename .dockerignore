@@ -2,3 +2,4 @@
 **/obj/
 .git/
 .env
+**/appsettings.Development.json

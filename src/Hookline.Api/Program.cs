@@ -7,8 +7,13 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("Hookline")
-    ?? throw new InvalidOperationException("Connection string is not configured");
+// appsettings.json lists the setting with an empty value on purpose: each environment must provide it.
+var connectionString = builder.Configuration.GetConnectionString("Hookline");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'Hookline' is not configured.");
+}
 
 builder.Services
     .AddManagementModule(connectionString)
