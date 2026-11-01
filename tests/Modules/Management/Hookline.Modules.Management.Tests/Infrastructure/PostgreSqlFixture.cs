@@ -1,8 +1,8 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
+using Hookline.Modules.Management.Application.ConsumerKeys;
 using Hookline.Modules.Management.Application.Consumers;
-using Hookline.Modules.Management.Domain.ConsumerKeys;
 using Hookline.Modules.Management.Infrastructure;
 using Hookline.Modules.Management.Tests.Integration;
 
@@ -77,16 +77,15 @@ public sealed class PostgreSqlFixture : IAsyncLifetime
         return (await response.Content.ReadFromJsonAsync<ConsumerDto>())!;
     }
 
-    // Issues a key straight in the database and returns it in plain text, ready to authenticate.
+    // Issues a key through the API, as the organization, and returns it in plain text, ready to authenticate.
     internal async Task<string> IssueKeyAsync(Guid consumerId)
     {
-        var (key, plainTextKey) = ConsumerKey.Issue(consumerId, Clock.GetUtcNow());
+        using var client = CreateClient();
 
-        await using var context = CreateContext();
-        context.ConsumerKeys.Add(key);
-        await context.SaveChangesAsync();
+        var response = await client.PostAsync($"/consumers/{consumerId}/keys", content: null);
+        response.EnsureSuccessStatusCode();
 
-        return plainTextKey;
+        return (await response.Content.ReadFromJsonAsync<IssuedConsumerKeyDto>())!.Key;
     }
 }
 

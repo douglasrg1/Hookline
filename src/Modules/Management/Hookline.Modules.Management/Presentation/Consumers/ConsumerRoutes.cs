@@ -12,14 +12,21 @@ namespace Hookline.Modules.Management.Presentation.Consumers;
 
 internal static class ConsumerRoutes
 {
+    private const string Tag = "Consumers";
+
     // consumers is /consumers. consumer is /consumers/{consumerId}, behind the consumer access filter.
     public static void Map(RouteGroupBuilder consumers, RouteGroupBuilder consumer)
     {
-        consumers.MapPost("", CreateAsync).RequireAuthorization(AuthorizationPolicies.Organization);
-        consumers.MapGet("", ListAsync).RequireAuthorization(AuthorizationPolicies.Organization);
+        // Groups with no prefix of their own, only to tag these routes: nested groups inherit metadata,
+        // so a tag on the parent groups would also land on the key and endpoint routes.
+        var collection = consumers.MapGroup("").WithTags(Tag);
+        var single = consumer.MapGroup("").WithTags(Tag);
 
-        consumer.MapGet("", GetAsync);
-        consumer.MapDelete("", DeleteAsync).RequireAuthorization(AuthorizationPolicies.Organization);
+        collection.MapPost("", CreateAsync).RequireAuthorization(AuthorizationPolicies.Organization);
+        collection.MapGet("", ListAsync).RequireAuthorization(AuthorizationPolicies.Organization);
+
+        single.MapGet("", GetAsync);
+        single.MapDelete("", DeleteAsync).RequireAuthorization(AuthorizationPolicies.Organization);
     }
 
     private static async Task<Results<Created<ConsumerDto>, ProblemHttpResult>> CreateAsync(

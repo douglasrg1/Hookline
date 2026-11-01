@@ -11,6 +11,9 @@ internal sealed class ConsumerRepository(ManagementDbContext context) : IConsume
     public Task<Consumer?> FindAsync(Guid consumerId, CancellationToken cancellationToken) =>
         context.Consumers.SingleOrDefaultAsync(c => c.Id == consumerId, cancellationToken);
 
+    public Task<bool> ExistsAsync(Guid consumerId, CancellationToken cancellationToken) =>
+        context.Consumers.AnyAsync(c => c.Id == consumerId, cancellationToken);
+
     public Task<bool> ExternalIdExistsAsync(string externalId, CancellationToken cancellationToken) =>
         context.Consumers.AnyAsync(c => c.ExternalId == externalId, cancellationToken);
 

@@ -9,6 +9,8 @@ internal interface IConsumerRepository
 
     Task<Consumer?> FindAsync(Guid consumerId, CancellationToken cancellationToken);
 
+    Task<bool> ExistsAsync(Guid consumerId, CancellationToken cancellationToken);
+
     Task<bool> ExternalIdExistsAsync(string externalId, CancellationToken cancellationToken);
 
     // Ordered by id, which follows creation time. Returns at most count consumers created after the given id.
