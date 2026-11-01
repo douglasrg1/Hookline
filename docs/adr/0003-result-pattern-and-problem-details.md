@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-31
+- **Updated:** 2026-11-01, adding how requests are validated.
 
 ## Context
 
@@ -42,6 +43,12 @@ All error responses use the Problem Details format (RFC 9457), with the content 
 - Exception messages and stack traces go to the logs only. They are never written to a response.
 - Requests aborted by the client are handled by ASP.NET Core itself, before any handler runs: they are logged at debug level and get the status 499.
 
+### Validating requests
+
+- The rules for what a request may contain live in the domain entities and come back as `Result`, with their own codes, such as `consumer.name_required`. That includes what is often called request validation: a missing field, a value that is too long or in the wrong format.
+- Requests that cannot be read at all, such as a body that is not JSON or a query value of the wrong type, are rejected by ASP.NET Core before any route code runs.
+- The built-in validation of .NET 10 (`AddValidation` with data annotations) is not used. It can be adopted later for a rule that is only about the format of a request and has no place in the domain.
+
 ## Consequences
 
 **Positive**
@@ -61,3 +68,4 @@ All error responses use the Problem Details format (RFC 9457), with the content 
 
 - **Exceptions for business errors**, mapped to status codes by a global handler. Simpler to write, but expected failures disappear from signatures, and every new business error needs a new exception type and mapping.
 - **A third-party result library.** The behavior needed here fits in a few dozen lines, so an extra dependency adds more than it saves.
+- **The built-in validation of .NET 10 for every request.** It would repeat rules the domain already enforces, and its 400 responses use a different shape, a dictionary of field errors without a `code`.
