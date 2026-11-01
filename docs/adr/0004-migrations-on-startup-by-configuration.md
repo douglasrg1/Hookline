@@ -21,9 +21,8 @@ The environments have different needs:
 ### On startup, controlled by a setting
 
 - The setting `Database:ApplyMigrationsOnStartup` turns it on. It is `false` in `appsettings.json` and `true` in the local `appsettings.Development.json` and in `docker-compose.yml`.
-- When it is on, the API runs these steps after building the host and before serving requests:
-  1. It validates the settings, with the same checks the host runs later when it starts. A misconfigured API stops before it changes the database.
-  2. It applies each module's migrations, through a public method of the module's registration class, such as `ApplyManagementMigrationsAsync`. The `DbContext` stays internal to the module. Today only Management has migrations. Ingestion and Delivery add their method when they get tables.
+- Right after building the host, the API validates the settings, with the same checks the host would only run inside `app.Run()`. This happens whether the setting is on or not, so a misconfigured API stops before anything else runs and never changes the database.
+- When the setting is on, the API then applies each module's migrations, before serving requests, through a public method of the module's registration class, such as `ApplyManagementMigrationsAsync`. The `DbContext` stays internal to the module. Today only Management has migrations. Ingestion and Delivery add their method when they get tables.
 
 ### In production, a deploy step
 

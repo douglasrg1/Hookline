@@ -34,13 +34,13 @@ builder.Services.AddExceptionHandler<UnhandledExceptionHandler>();
 
 var app = builder.Build();
 
+// The host would check the settings only inside app.Run(). Checking them right away stops a
+// misconfigured API before anything else runs, so it never changes the database.
+app.Services.GetRequiredService<IStartupValidator>().Validate();
+
 // On in development and in Docker Compose. In production, migrations run as a deploy step instead.
 if (app.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"))
 {
-    // The host checks the settings only when it starts, which comes after this point.
-    // Checking them first means a misconfigured API never changes the database.
-    app.Services.GetRequiredService<IStartupValidator>().Validate();
-
     await app.Services.ApplyManagementMigrationsAsync();
 }
 
