@@ -22,4 +22,8 @@
     <Project Path="tests/Hookline.ArchitectureTests/Hookline.ArchitectureTests.csproj" />
     <Project Path="tests/Hookline.SharedKernel.Tests/Hookline.SharedKernel.Tests.csproj" />
   </Folder>
+  <Folder Name="/tests/Modules/" />
+  <Folder Name="/tests/Modules/Management/">
+    <Project Path="tests/Modules/Management/Hookline.Modules.Management.Tests/Hookline.Modules.Management.Tests.csproj" />
+  </Folder>
 </Solution>

@@ -6,10 +6,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hookline.Modules.Management.Contracts\Hookline.Modules.Management.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Hookline.SharedKernel\Hookline.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Hookline.Modules.Management.Tests" />
   </ItemGroup>
 
 </Project>
