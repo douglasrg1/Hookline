@@ -16,9 +16,9 @@ Reliable webhook delivery platform in .NET: idempotent ingestion, transactional 
 
 | Module | Responsibility |
 |---|---|
-| Management | Applications, API keys and subscriber endpoints |
-| Ingestion | Accepting messages from applications |
-| Delivery | Delivering messages to subscriber endpoints |
+| Management | Consumers, their API keys and their endpoints |
+| Ingestion | Accepting messages from the organization |
+| Delivery | Delivering messages to consumer endpoints |
 
 Each module is a single project with its layers as folders (`Domain`, `Application`, `Infrastructure`, `Presentation`) plus a `Contracts` project that holds everything other modules are allowed to see. Module internals are `internal`. Modules never read or write another module's tables.
 

@@ -9,7 +9,7 @@ Hookline is consumed by other systems, not by people. Those systems need two thi
 
 Inside the code, failures come in two very different kinds:
 
-- **Expected failures** are part of the business: an invalid URL, an application that does not exist, an endpoint that is already registered. The caller can fix them.
+- **Expected failures** are part of the business: an invalid URL, a consumer that does not exist, an endpoint that is already registered. The caller can fix them.
 - **Unexpected failures** are bugs or infrastructure problems: a null reference, a database that is down. The caller cannot fix them, and the response must not reveal internal details.
 
 Using exceptions for both makes expected failures invisible in method signatures and turns ordinary business outcomes into control flow by exception.
