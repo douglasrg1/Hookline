@@ -32,4 +32,12 @@ internal static class EndpointErrors
     public static Error EventTypeDuplicated(string eventType) => Error.Validation(
         "endpoint.event_type_duplicated",
         $"The event type '{eventType}' appears more than once.");
+
+    public static readonly Error NotFound = Error.NotFound(
+        "endpoint.not_found",
+        "The endpoint was not found.");
+
+    public static readonly Error UrlTaken = Error.Conflict(
+        "endpoint.url_taken",
+        "The consumer already has an endpoint with this URL.");
 }

@@ -1,6 +1,7 @@
 using Hookline.Modules.Management.Presentation.Authentication;
 using Hookline.Modules.Management.Presentation.ConsumerKeys;
 using Hookline.Modules.Management.Presentation.Consumers;
+using Hookline.Modules.Management.Presentation.Endpoints;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +22,7 @@ internal static class ManagementEndpoints
 
         ConsumerRoutes.Map(consumers, consumer);
         ConsumerKeyRoutes.Map(consumer);
+        EndpointRoutes.Map(consumer);
 
         return endpoints;
     }

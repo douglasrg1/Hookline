@@ -2,6 +2,7 @@ using Hookline.Modules.Management.Application.Abstractions;
 using Hookline.Modules.Management.Application.Authentication;
 using Hookline.Modules.Management.Application.ConsumerKeys;
 using Hookline.Modules.Management.Application.Consumers;
+using Hookline.Modules.Management.Application.Endpoints;
 using Hookline.Modules.Management.Infrastructure;
 using Hookline.Modules.Management.Infrastructure.Repositories;
 using Hookline.Modules.Management.Infrastructure.Security;
@@ -40,6 +41,7 @@ public static class ManagementModule
         services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ManagementDbContext>());
         services.AddScoped<IConsumerRepository, ConsumerRepository>();
         services.AddScoped<IConsumerKeyRepository, ConsumerKeyRepository>();
+        services.AddScoped<IEndpointRepository, EndpointRepository>();
 
         services.AddScoped<KeyAuthenticator>();
         services.AddScoped<CreateConsumer>();
@@ -49,6 +51,12 @@ public static class ManagementModule
         services.AddScoped<IssueConsumerKey>();
         services.AddScoped<ListConsumerKeys>();
         services.AddScoped<RevokeConsumerKey>();
+        services.AddScoped<CreateEndpoint>();
+        services.AddScoped<ListEndpoints>();
+        services.AddScoped<GetEndpoint>();
+        services.AddScoped<UpdateEndpoint>();
+        services.AddScoped<DeleteEndpoint>();
+        services.AddScoped<SetEndpointEnabled>();
 
         // Consumers and their keys live in this module, so it provides the API's only authentication scheme.
         services.AddAuthentication(BearerKeyAuthenticationHandler.SchemeName)
