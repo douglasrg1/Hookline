@@ -57,6 +57,7 @@ public static class ManagementModule
         services.AddScoped<UpdateEndpoint>();
         services.AddScoped<DeleteEndpoint>();
         services.AddScoped<SetEndpointEnabled>();
+        services.AddScoped<GetEndpointSecret>();
 
         // Consumers and their keys live in this module, so it provides the API's only authentication scheme.
         services.AddAuthentication(BearerKeyAuthenticationHandler.SchemeName)

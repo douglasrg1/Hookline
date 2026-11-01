@@ -27,6 +27,7 @@ internal static class EndpointRoutes
         endpoint.MapDelete("", DeleteAsync);
         endpoint.MapPost("/enable", EnableAsync);
         endpoint.MapPost("/disable", DisableAsync);
+        endpoint.MapGet("/secret", GetSecretAsync);
     }
 
     private static async Task<Results<Created<EndpointDto>, ProblemHttpResult>> CreateAsync(
@@ -101,6 +102,25 @@ internal static class EndpointRoutes
         SetEndpointEnabled useCase,
         CancellationToken cancellationToken) =>
         SetEnabledAsync(consumerId, endpointId, enabled: false, useCase, cancellationToken);
+
+    private static async Task<Results<Ok<EndpointSecretDto>, ProblemHttpResult>> GetSecretAsync(
+        Guid consumerId,
+        Guid endpointId,
+        GetEndpointSecret useCase,
+        HttpResponse response,
+        CancellationToken cancellationToken)
+    {
+        var result = await useCase.HandleAsync(consumerId, endpointId, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblem();
+        }
+
+        response.DoNotCache();
+
+        return TypedResults.Ok(result.Value);
+    }
 
     private static async Task<Results<Ok<EndpointDto>, ProblemHttpResult>> SetEnabledAsync(
         Guid consumerId,

@@ -21,6 +21,7 @@ public class ConsumerKeyRoutesTests(PostgreSqlFixture fixture)
         var response = await client.PostAsync($"/consumers/{consumer.Id}/keys", content: null);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        response.Headers.CacheControl.ShouldNotBeNull().NoStore.ShouldBeTrue();
 
         var issued = (await response.Content.ReadFromJsonAsync<IssuedConsumerKeyDto>())!;
         issued.ConsumerId.ShouldBe(consumer.Id);

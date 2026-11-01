@@ -28,11 +28,19 @@ internal static class ConsumerKeyRoutes
     private static async Task<Results<Created<IssuedConsumerKeyDto>, ProblemHttpResult>> IssueAsync(
         Guid consumerId,
         IssueConsumerKey useCase,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         var result = await useCase.HandleAsync(consumerId, cancellationToken);
 
-        return result.IsSuccess ? TypedResults.Created((string?)null, result.Value) : result.Error.ToProblem();
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblem();
+        }
+
+        response.DoNotCache();
+
+        return TypedResults.Created((string?)null, result.Value);
     }
 
     private static async Task<Results<Ok<Page<ConsumerKeyDto>>, ProblemHttpResult>> ListAsync(
