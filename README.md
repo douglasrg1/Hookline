@@ -27,6 +27,7 @@ The reasoning behind these choices is recorded in the architecture decision reco
 - [ADR 0001: Modular monolith with a schema per module](docs/adr/0001-modular-monolith.md)
 - [ADR 0002: PostgreSQL as the database](docs/adr/0002-postgresql.md)
 - [ADR 0003: Result pattern for expected errors and Problem Details for every error response](docs/adr/0003-result-pattern-and-problem-details.md)
+- [ADR 0004: Migrations applied on startup only where configuration allows it](docs/adr/0004-migrations-on-startup-by-configuration.md)
 
 ## Tech stack
 
