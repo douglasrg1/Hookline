@@ -1,0 +1,7 @@
+M:System.Guid.NewGuid;Use Guid.CreateVersion7(now), with the time from TimeProvider, so every id is time-ordered.
+M:System.Guid.CreateVersion7;Pass the current time from TimeProvider: Guid.CreateVersion7(now).
+P:System.DateTime.Now;Use TimeProvider, so the clock can be controlled in tests.
+P:System.DateTime.UtcNow;Use TimeProvider, so the clock can be controlled in tests.
+P:System.DateTime.Today;Use TimeProvider, so the clock can be controlled in tests.
+P:System.DateTimeOffset.Now;Use TimeProvider, so the clock can be controlled in tests.
+P:System.DateTimeOffset.UtcNow;Use TimeProvider, so the clock can be controlled in tests.
