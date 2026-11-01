@@ -19,4 +19,20 @@ internal static class CallerClaims
 
         return new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType));
     }
+
+    // The way back. Null when the request was not authenticated by the API's scheme.
+    public static Caller? FromPrincipal(ClaimsPrincipal principal)
+    {
+        if (principal.IsInRole(OrganizationRole))
+        {
+            return Caller.Organization;
+        }
+
+        if (principal.IsInRole(ConsumerRole) && Guid.TryParse(principal.FindFirstValue(ConsumerIdType), out var consumerId))
+        {
+            return Caller.Consumer(consumerId);
+        }
+
+        return null;
+    }
 }
