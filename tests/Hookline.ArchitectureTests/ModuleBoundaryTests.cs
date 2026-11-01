@@ -1,5 +1,7 @@
 using System.Reflection;
 
+using Microsoft.EntityFrameworkCore.Migrations;
+
 using NetArchTest.Rules;
 
 using Shouldly;
@@ -54,7 +56,10 @@ public class ModuleBoundaryTests
     [Theory, MemberData(nameof(Modules))]
     public void Module_exposes_only_its_registration_class(string module)
     {
-        var publicTypes = Load(module).GetExportedTypes().Select(t => t.Name);
+        // dotnet-ef generates migrations as public classes. They are not part of the module's surface.
+        var publicTypes = Load(module).GetExportedTypes()
+            .Where(t => !t.IsAssignableTo(typeof(Migration)))
+            .Select(t => t.Name);
 
         publicTypes.ShouldBe(new[] { $"{module}Module" });
     }

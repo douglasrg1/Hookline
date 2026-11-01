@@ -10,9 +10,7 @@ public static class ManagementModule
 {
     public static IServiceCollection AddManagementModule(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<ManagementDbContext>(options => options.UseNpgsql(
-            connectionString,
-            npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", ManagementDbContext.Schema)));
+        services.AddDbContext<ManagementDbContext>(options => ManagementDbContext.Configure(options, connectionString));
 
         return services;
     }

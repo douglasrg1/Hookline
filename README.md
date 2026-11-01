@@ -30,7 +30,7 @@ The reasoning behind these choices is recorded in the architecture decision reco
 
 ## Tech stack
 
-.NET 10, ASP.NET Core, Entity Framework Core with Npgsql, PostgreSQL 17, xUnit, Shouldly, NetArchTest, Docker Compose and GitHub Actions.
+.NET 10, ASP.NET Core, Entity Framework Core with Npgsql, PostgreSQL 17, xUnit, Shouldly, NetArchTest, Testcontainers, Docker Compose and GitHub Actions.
 
 ## Getting started
 
@@ -84,9 +84,30 @@ dotnet run --project src/Hookline.Api
 
 ### Run the tests
 
+The persistence tests start a PostgreSQL container with Testcontainers, so Docker must be running:
+
 ```bash
 dotnet test
 ```
+
+With Rancher Desktop, point Testcontainers at its Docker socket first:
+
+```bash
+export DOCKER_HOST=unix://$HOME/.rd/docker.sock
+export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+export TESTCONTAINERS_HOST_OVERRIDE=localhost
+```
+
+### Add a migration
+
+Each module keeps its own migrations, and `dotnet-ef` is a local tool of the repository. For the Management module:
+
+```bash
+dotnet tool restore
+dotnet ef migrations add <Name> --project src/Modules/Management/Hookline.Modules.Management --output-dir Infrastructure/Migrations
+```
+
+A test fails when the model changes and no migration was added for it.
 
 ## Project structure
 

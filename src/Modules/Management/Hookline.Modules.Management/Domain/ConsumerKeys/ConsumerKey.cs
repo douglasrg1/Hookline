@@ -9,9 +9,9 @@ namespace Hookline.Modules.Management.Domain.ConsumerKeys;
 internal sealed class ConsumerKey
 {
     public const string KeyPrefix = "hl_";
+    public const int DisplayPrefixLength = 12;
 
     private const int RandomByteLength = 32;
-    private const int DisplayPrefixLength = 12;
 
     private ConsumerKey()
     {
