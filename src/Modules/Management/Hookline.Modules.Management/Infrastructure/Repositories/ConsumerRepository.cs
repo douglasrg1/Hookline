@@ -14,11 +14,13 @@ internal sealed class ConsumerRepository(ManagementDbContext context) : IConsume
     public Task<bool> ExternalIdExistsAsync(string externalId, CancellationToken cancellationToken) =>
         context.Consumers.AnyAsync(c => c.ExternalId == externalId, cancellationToken);
 
-    public async Task<IReadOnlyList<Consumer>> ListAsync(CancellationToken cancellationToken) =>
+    // Keyset pagination: the primary key index finds where the page starts, however deep the page is.
+    public async Task<IReadOnlyList<Consumer>> ListAsync(Guid? after, int count, CancellationToken cancellationToken) =>
         await context.Consumers
             .AsNoTracking()
-            .OrderBy(c => c.CreatedAt)
-            .ThenBy(c => c.Id)
+            .Where(c => after == null || c.Id > after)
+            .OrderBy(c => c.Id)
+            .Take(count)
             .ToListAsync(cancellationToken);
 
     // A single DELETE statement. The database cascades it to the keys and endpoints.

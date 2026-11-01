@@ -1,4 +1,5 @@
 using Hookline.Modules.Management.Application.Consumers;
+using Hookline.Modules.Management.Application.Pagination;
 using Hookline.Modules.Management.Presentation.Authentication;
 using Hookline.SharedKernel.AspNetCore;
 
@@ -33,10 +34,17 @@ internal static class ConsumerRoutes
             : result.Error.ToProblem();
     }
 
-    private static async Task<Ok<IReadOnlyList<ConsumerDto>>> ListAsync(
+    // GET /consumers?after={id}&limit={n}. Without "after", the first page.
+    private static async Task<Results<Ok<Page<ConsumerDto>>, ProblemHttpResult>> ListAsync(
+        Guid? after,
+        int? limit,
         ListConsumers useCase,
-        CancellationToken cancellationToken) =>
-        TypedResults.Ok(await useCase.HandleAsync(cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        var result = await useCase.HandleAsync(after, limit, cancellationToken);
+
+        return result.IsSuccess ? TypedResults.Ok(result.Value) : result.Error.ToProblem();
+    }
 
     private static async Task<Results<Ok<ConsumerDto>, ProblemHttpResult>> GetAsync(
         Guid consumerId,

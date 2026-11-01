@@ -11,8 +11,8 @@ internal interface IConsumerRepository
 
     Task<bool> ExternalIdExistsAsync(string externalId, CancellationToken cancellationToken);
 
-    // Oldest first.
-    Task<IReadOnlyList<Consumer>> ListAsync(CancellationToken cancellationToken);
+    // Ordered by id, which follows creation time. Returns at most count consumers created after the given id.
+    Task<IReadOnlyList<Consumer>> ListAsync(Guid? after, int count, CancellationToken cancellationToken);
 
     // Deletes right away, together with the consumer's keys and endpoints. False when it does not exist.
     Task<bool> DeleteAsync(Guid consumerId, CancellationToken cancellationToken);

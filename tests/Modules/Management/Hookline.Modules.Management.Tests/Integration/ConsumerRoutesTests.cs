@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 
 using Hookline.Modules.Management.Application.Consumers;
+using Hookline.Modules.Management.Application.Pagination;
 using Hookline.Modules.Management.Tests.Infrastructure;
 
 using Shouldly;
@@ -82,16 +83,50 @@ public class ConsumerRoutesTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
-    public async Task Organization_lists_consumers()
+    public async Task Organization_lists_every_consumer_page_by_page()
     {
-        var first = await fixture.CreateConsumerAsync();
-        var second = await fixture.CreateConsumerAsync();
+        ConsumerDto[] created = [
+            await fixture.CreateConsumerAsync(),
+            await fixture.CreateConsumerAsync(),
+            await fixture.CreateConsumerAsync()];
         using var client = fixture.CreateClient();
 
-        var consumers = (await client.GetFromJsonAsync<List<ConsumerDto>>("/consumers"))!;
+        // The database is shared with other tests, so the walk checks the order and the pages, not a total.
+        var pages = new List<Page<ConsumerDto>>();
+        Guid? after = null;
 
-        consumers.ShouldContain(first);
-        consumers.ShouldContain(second);
+        do
+        {
+            var query = after is null ? "?limit=2" : $"?limit=2&after={after}";
+            var page = (await client.GetFromJsonAsync<Page<ConsumerDto>>($"/consumers{query}"))!;
+
+            pages.Add(page);
+            after = page.Next;
+
+            // A cursor that does not move forward would loop forever: fail instead of hanging.
+            pages.Count.ShouldBeLessThan(1_000);
+        }
+        while (after is not null);
+
+        pages.SkipLast(1).ShouldAllBe(page => page.Items.Count == 2);
+        pages[^1].Items.Count.ShouldBeInRange(0, 2);
+
+        var ids = pages.SelectMany(page => page.Items).Select(consumer => consumer.Id).ToList();
+        ids.ShouldBe(ids.Order().ToList());
+        ids.ShouldBeUnique();
+        created.Select(consumer => consumer.Id).ShouldBeSubsetOf(ids);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(101)]
+    public async Task List_rejects_a_limit_out_of_range(int limit)
+    {
+        using var client = fixture.CreateClient();
+
+        var response = await client.GetAsync($"/consumers?limit={limit}");
+
+        await response.ShouldBeProblemAsync(HttpStatusCode.BadRequest, "page.limit_invalid");
     }
 
     [Fact]
