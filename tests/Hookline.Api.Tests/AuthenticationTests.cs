@@ -82,7 +82,7 @@ public class AuthenticationTests(HooklineApiFactory factory) : IClassFixture<Hoo
     {
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         response.Headers.WwwAuthenticate.ToString().ShouldBe("Bearer");
-        response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json");
+        response.Content.Headers.ContentType.ShouldNotBeNull().MediaType.ShouldBe("application/problem+json");
 
         using var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         problem.RootElement.GetProperty("status").GetInt32().ShouldBe(401);

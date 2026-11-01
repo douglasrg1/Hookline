@@ -24,7 +24,7 @@ public class ErrorHandlingTests(HooklineApiFactory factory) : IClassFixture<Hook
         var body = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
-        response.Content.Headers.ContentType?.MediaType.ShouldBe(ProblemJson);
+        response.Content.Headers.ContentType.ShouldNotBeNull().MediaType.ShouldBe(ProblemJson);
 
         using var problem = JsonDocument.Parse(body);
         problem.RootElement.GetProperty("status").GetInt32().ShouldBe(500);
@@ -46,7 +46,7 @@ public class ErrorHandlingTests(HooklineApiFactory factory) : IClassFixture<Hook
         var body = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        response.Content.Headers.ContentType?.MediaType.ShouldBe(ProblemJson);
+        response.Content.Headers.ContentType.ShouldNotBeNull().MediaType.ShouldBe(ProblemJson);
 
         using var problem = JsonDocument.Parse(body);
         problem.RootElement.GetProperty("status").GetInt32().ShouldBe(400);
@@ -65,7 +65,7 @@ public class ErrorHandlingTests(HooklineApiFactory factory) : IClassFixture<Hook
         var response = await client.GetAsync("/does-not-exist");
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        response.Content.Headers.ContentType?.MediaType.ShouldBe(ProblemJson);
+        response.Content.Headers.ContentType.ShouldNotBeNull().MediaType.ShouldBe(ProblemJson);
 
         using var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         problem.RootElement.GetProperty("status").GetInt32().ShouldBe(404);

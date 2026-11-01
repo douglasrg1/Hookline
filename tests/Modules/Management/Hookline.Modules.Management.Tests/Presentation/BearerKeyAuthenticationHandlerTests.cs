@@ -42,7 +42,7 @@ public class BearerKeyAuthenticationHandlerTests
     {
         var result = await AuthenticateAsync("Bearer");
 
-        result.Failure?.Message.ShouldBe("The API key is missing.");
+        result.Failure.ShouldNotBeNull().Message.ShouldBe("The API key is missing.");
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class BearerKeyAuthenticationHandlerTests
     {
         var result = await AuthenticateAsync("Bearer wrong-key");
 
-        result.Failure?.Message.ShouldBe("The API key is not valid.");
+        result.Failure.ShouldNotBeNull().Message.ShouldBe("The API key is not valid.");
     }
 
     [Theory]

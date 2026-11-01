@@ -14,7 +14,7 @@ internal static class ProblemAssertions
         string? code = null)
     {
         response.StatusCode.ShouldBe(status);
-        response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json");
+        response.Content.Headers.ContentType.ShouldNotBeNull().MediaType.ShouldBe("application/problem+json");
 
         var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
 

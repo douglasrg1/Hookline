@@ -33,7 +33,7 @@ public class ApiReferenceTests(HooklineApiFactory factory) : IClassFixture<Hookl
         var response = await client.GetAsync(ScalarPath);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        response.Content.Headers.ContentType?.MediaType.ShouldBe("text/html");
+        response.Content.Headers.ContentType.ShouldNotBeNull().MediaType.ShouldBe("text/html");
     }
 
     [Theory]
