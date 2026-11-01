@@ -3,6 +3,7 @@ using Hookline.Modules.Delivery;
 using Hookline.Modules.Ingestion;
 using Hookline.Modules.Management;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 using Scalar.AspNetCore;
@@ -27,6 +28,10 @@ builder.Services.AddHealthChecks()
 
 builder.Services.AddOpenApi();
 
+// Every route requires an authenticated caller, unless it is explicitly marked as public.
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+
 builder.Services.AddProblemDetails();
 // Order matters: handlers are asked in registration order and the first one that handles wins.
 builder.Services.AddExceptionHandler<BadHttpRequestExceptionHandler>();
@@ -47,15 +52,20 @@ if (app.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"))
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
+// Added explicitly after the error handling, so a failure while checking a key, such as the
+// database being down, still becomes a Problem Details response.
+app.UseAuthentication();
+app.UseAuthorization();
+
 // API description and interactive reference only in development:
 // production does not expose the full map of the API.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapOpenApi().AllowAnonymous();
+    app.MapScalarApiReference().AllowAnonymous();
 }
 
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.MapManagementEndpoints()
     .MapIngestionEndpoints()

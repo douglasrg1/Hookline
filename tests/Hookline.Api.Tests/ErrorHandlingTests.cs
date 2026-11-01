@@ -59,7 +59,8 @@ public class ErrorHandlingTests(HooklineApiFactory factory) : IClassFixture<Hook
     [Fact]
     public async Task Unknown_route_returns_a_not_found_problem()
     {
-        using var client = factory.CreateClient();
+        // Without a key, every route answers 401, existing or not.
+        using var client = factory.CreateClientWithKey(HooklineApiFactory.OrganizationKey);
 
         var response = await client.GetAsync("/does-not-exist");
 

@@ -41,7 +41,8 @@ public class ApiReferenceTests(HooklineApiFactory factory) : IClassFixture<Hookl
     [InlineData(ScalarPath)]
     public async Task Api_reference_is_not_exposed_in_production(string path)
     {
-        using var client = factory.CreateClient();
+        // Authenticated, so the 404 means the route does not exist, not that the caller lacks a key.
+        using var client = factory.CreateClientWithKey(HooklineApiFactory.OrganizationKey);
 
         var response = await client.GetAsync(path);
 

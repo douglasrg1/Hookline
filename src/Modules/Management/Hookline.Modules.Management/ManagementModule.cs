@@ -1,8 +1,11 @@
 using Hookline.Modules.Management.Application.Abstractions;
 using Hookline.Modules.Management.Application.Authentication;
 using Hookline.Modules.Management.Infrastructure;
+using Hookline.Modules.Management.Infrastructure.Repositories;
 using Hookline.Modules.Management.Infrastructure.Security;
 using Hookline.Modules.Management.Presentation;
+using Hookline.Modules.Management.Presentation.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +32,15 @@ public static class ManagementModule
             .ValidateOnStart();
 
         services.AddSingleton<ISecretProtector, AesGcmSecretProtector>();
+
+        services.AddScoped<IConsumerKeyRepository, ConsumerKeyRepository>();
+        services.AddScoped<KeyAuthenticator>();
+
+        // Consumers and their keys live in this module, so it provides the API's only authentication scheme.
+        services.AddAuthentication(BearerKeyAuthenticationHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, BearerKeyAuthenticationHandler>(
+                BearerKeyAuthenticationHandler.SchemeName,
+                configureOptions: null);
 
         return services;
     }
