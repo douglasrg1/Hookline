@@ -6,7 +6,7 @@
 
 ## Context
 
-Hookline has three clear areas of responsibility: managing applications and endpoints, accepting messages, and delivering them. Delivery has different scaling needs from the rest, so it may need to run as a separate service in the future.
+Hookline has three clear areas of responsibility: managing consumers and their endpoints, accepting messages, and delivering them. Delivery has different scaling needs from the rest, so it may need to run as a separate service in the future.
 
 Starting with microservices would mean building infrastructure (a message broker, several deployables, distributed tracing) before the first feature works. The project is developed in small increments, so that cost would delay every early milestone.
 

@@ -19,8 +19,14 @@ services:
 
   api:
     build: .
+    # A small init process runs as PID 1. Without it, the kernel ignores the abort signal .NET raises
+    # on an unhandled exception, and a failed startup keeps the container running at full CPU.
+    init: true
     environment:
       ConnectionStrings__Hookline: Host=postgres;Database=hookline;Username=hookline;Password=${POSTGRES_PASSWORD};Gss Encryption Mode=Disable
+      Database__ApplyMigrationsOnStartup: "true"
+      Auth__OrganizationKey: ${AUTH_ORGANIZATION_KEY}
+      Encryption__Key: ${ENCRYPTION_KEY}
     ports:
       - "8080:8080"
     depends_on:

@@ -16,9 +16,9 @@ Reliable webhook delivery platform in .NET: idempotent ingestion, transactional 
 
 | Module | Responsibility |
 |---|---|
-| Management | Applications, API keys and subscriber endpoints |
-| Ingestion | Accepting messages from applications |
-| Delivery | Delivering messages to subscriber endpoints |
+| Management | Consumers, their API keys and their endpoints |
+| Ingestion | Accepting messages from the organization |
+| Delivery | Delivering messages to consumer endpoints |
 
 Each module is a single project with its layers as folders (`Domain`, `Application`, `Infrastructure`, `Presentation`) plus a `Contracts` project that holds everything other modules are allowed to see. Module internals are `internal`. Modules never read or write another module's tables.
 
@@ -27,10 +27,11 @@ The reasoning behind these choices is recorded in the architecture decision reco
 - [ADR 0001: Modular monolith with a schema per module](docs/adr/0001-modular-monolith.md)
 - [ADR 0002: PostgreSQL as the database](docs/adr/0002-postgresql.md)
 - [ADR 0003: Result pattern for expected errors and Problem Details for every error response](docs/adr/0003-result-pattern-and-problem-details.md)
+- [ADR 0004: Migrations applied on startup only where configuration allows it](docs/adr/0004-migrations-on-startup-by-configuration.md)
 
 ## Tech stack
 
-.NET 10, ASP.NET Core, Entity Framework Core with Npgsql, PostgreSQL 17, xUnit, Shouldly, NetArchTest, Docker Compose and GitHub Actions.
+.NET 10, ASP.NET Core, Entity Framework Core with Npgsql, PostgreSQL 17, xUnit, Shouldly, NetArchTest, Testcontainers, Docker Compose and GitHub Actions.
 
 ## Getting started
 
@@ -38,13 +39,21 @@ Prerequisites: [.NET 10 SDK](https://dotnet.microsoft.com/download) and Docker.
 
 ### Run everything with Docker
 
-1. Create your local environment file and set a password for the local database:
+1. Create your local environment file:
 
    ```bash
    cp .env.example .env
    ```
 
-2. Start the database and the API:
+   Set a password for the local database and fill in the two keys, generating each one with:
+
+   ```bash
+   openssl rand -base64 32
+   ```
+
+   `AUTH_ORGANIZATION_KEY` is the organization's API key. `ENCRYPTION_KEY` is the master key that encrypts the endpoint signing secrets.
+
+2. Start the database and the API. The API applies the database migrations when it starts:
 
    ```bash
    docker compose up --build
@@ -64,12 +73,21 @@ Start only the database:
 docker compose up -d postgres
 ```
 
-Then create `src/Hookline.Api/appsettings.Development.json` with your local values. `appsettings.json` lists every setting the API needs, with empty values; the API refuses to start while a required one is empty. Use the same password you set in `.env`:
+Then create `src/Hookline.Api/appsettings.Development.json` with your local values. `appsettings.json` lists every setting the API needs, with empty values; the API refuses to start while a required one is empty or invalid. Use the same password you set in `.env`, and generate each key with `openssl rand -base64 32`:
 
 ```json
 {
   "ConnectionStrings": {
     "Hookline": "Host=localhost;Port=5433;Database=hookline;Username=hookline;Password=<your-local-password>"
+  },
+  "Database": {
+    "ApplyMigrationsOnStartup": true
+  },
+  "Auth": {
+    "OrganizationKey": "<generated-key>"
+  },
+  "Encryption": {
+    "Key": "<generated-key>"
   }
 }
 ```
@@ -84,9 +102,30 @@ dotnet run --project src/Hookline.Api
 
 ### Run the tests
 
+The persistence tests start a PostgreSQL container with Testcontainers, so Docker must be running:
+
 ```bash
 dotnet test
 ```
+
+With Rancher Desktop, point Testcontainers at its Docker socket first:
+
+```bash
+export DOCKER_HOST=unix://$HOME/.rd/docker.sock
+export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+export TESTCONTAINERS_HOST_OVERRIDE=localhost
+```
+
+### Add a migration
+
+Each module keeps its own migrations, and `dotnet-ef` is a local tool of the repository. For the Management module:
+
+```bash
+dotnet tool restore
+dotnet ef migrations add <Name> --project src/Modules/Management/Hookline.Modules.Management --output-dir Infrastructure/Migrations
+```
+
+A test fails when the model changes and no migration was added for it.
 
 ## Project structure
 

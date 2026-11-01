@@ -3,6 +3,8 @@ using Hookline.Modules.Delivery;
 using Hookline.Modules.Ingestion;
 using Hookline.Modules.Management;
 
+using Microsoft.Extensions.Options;
+
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +33,16 @@ builder.Services.AddExceptionHandler<BadHttpRequestExceptionHandler>();
 builder.Services.AddExceptionHandler<UnhandledExceptionHandler>();
 
 var app = builder.Build();
+
+// The host would check the settings only inside app.Run(). Checking them right away stops a
+// misconfigured API before anything else runs, so it never changes the database.
+app.Services.GetRequiredService<IStartupValidator>().Validate();
+
+// On in development and in Docker Compose. In production, migrations run as a deploy step instead.
+if (app.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"))
+{
+    await app.Services.ApplyManagementMigrationsAsync();
+}
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
