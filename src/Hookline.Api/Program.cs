@@ -1,4 +1,5 @@
 using Hookline.Api.ErrorHandling;
+using Hookline.Api.OpenApi;
 using Hookline.Modules.Delivery;
 using Hookline.Modules.Ingestion;
 using Hookline.Modules.Management;
@@ -26,7 +27,7 @@ builder.Services
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString);
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 
 // Every route requires an authenticated caller, unless it is explicitly marked as public.
 builder.Services.AddAuthorizationBuilder()
@@ -62,7 +63,8 @@ app.UseAuthorization();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi().AllowAnonymous();
-    app.MapScalarApiReference().AllowAnonymous();
+    app.MapScalarApiReference(options => options.AddPreferredSecuritySchemes([BearerSecuritySchemeTransformer.SchemeName]))
+        .AllowAnonymous();
 }
 
 app.MapHealthChecks("/health").AllowAnonymous();

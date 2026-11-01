@@ -25,6 +25,22 @@ public class ApiReferenceTests(HooklineApiFactory factory) : IClassFixture<Hookl
         document.RootElement.GetProperty("openapi").GetString().ShouldStartWith("3.");
     }
 
+    // Scalar reads this to show a field for the key and send it with every request.
+    [Fact]
+    public async Task Openapi_document_asks_for_a_bearer_key_on_every_operation()
+    {
+        using var client = CreateDevelopmentClient();
+
+        using var document = JsonDocument.Parse(await client.GetStringAsync(OpenApiDocumentPath));
+
+        var scheme = document.RootElement.GetProperty("components").GetProperty("securitySchemes").GetProperty("Bearer");
+        scheme.GetProperty("type").GetString().ShouldBe("http");
+        scheme.GetProperty("scheme").GetString().ShouldBe("bearer");
+
+        var requirement = document.RootElement.GetProperty("security").EnumerateArray().ShouldHaveSingleItem();
+        requirement.TryGetProperty("Bearer", out _).ShouldBeTrue();
+    }
+
     [Fact]
     public async Task Scalar_reference_page_is_served_in_development()
     {
