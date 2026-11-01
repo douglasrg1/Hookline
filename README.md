@@ -20,12 +20,13 @@ Reliable webhook delivery platform in .NET: idempotent ingestion, transactional 
 | Ingestion | Accepting messages from applications |
 | Delivery | Delivering messages to subscriber endpoints |
 
-Each module is a single project with its layers as folders (`Domain`, `Application`, `Infrastructure`) plus a `Contracts` project that holds everything other modules are allowed to see. Module internals are `internal`. Modules never read or write another module's tables.
+Each module is a single project with its layers as folders (`Domain`, `Application`, `Infrastructure`, `Presentation`) plus a `Contracts` project that holds everything other modules are allowed to see. Module internals are `internal`. Modules never read or write another module's tables.
 
 The reasoning behind these choices is recorded in the architecture decision records:
 
 - [ADR 0001: Modular monolith with a schema per module](docs/adr/0001-modular-monolith.md)
 - [ADR 0002: PostgreSQL as the database](docs/adr/0002-postgresql.md)
+- [ADR 0003: Result pattern for expected errors and Problem Details for every error response](docs/adr/0003-result-pattern-and-problem-details.md)
 
 ## Tech stack
 
